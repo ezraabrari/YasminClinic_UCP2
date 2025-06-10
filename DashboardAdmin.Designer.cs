@@ -28,85 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnJadwalDokter = new System.Windows.Forms.Button();
-            this.btnKelolaDokter = new System.Windows.Forms.Button();
-            this.btnPasien = new System.Windows.Forms.Button();
-            this.btnKelolaResepsionis = new System.Windows.Forms.Button();
-            this.btnreservasi = new System.Windows.Forms.Button();
-            this.btnRekamMedis = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.btnLogOut = new System.Windows.Forms.Button();
+            this.btnReport = new System.Windows.Forms.Button();
+            this.btnRekamMedis = new System.Windows.Forms.Button();
+            this.btnreservasi = new System.Windows.Forms.Button();
+            this.btnKelolaResepsionis = new System.Windows.Forms.Button();
+            this.btnJadwalDokter = new System.Windows.Forms.Button();
+            this.btnKelolaDokter = new System.Windows.Forms.Button();
+            this.btnPasien = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // btnJadwalDokter
-            // 
-            this.btnJadwalDokter.BackgroundImage = global::YasminClinic.Properties.Resources.schedule;
-            this.btnJadwalDokter.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnJadwalDokter.Location = new System.Drawing.Point(543, 75);
-            this.btnJadwalDokter.Name = "btnJadwalDokter";
-            this.btnJadwalDokter.Size = new System.Drawing.Size(187, 119);
-            this.btnJadwalDokter.TabIndex = 0;
-            this.btnJadwalDokter.UseVisualStyleBackColor = true;
-            this.btnJadwalDokter.Click += new System.EventHandler(this.btnJadwalDokter_Click);
-            // 
-            // btnKelolaDokter
-            // 
-            this.btnKelolaDokter.BackgroundImage = global::YasminClinic.Properties.Resources.doctor;
-            this.btnKelolaDokter.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnKelolaDokter.Location = new System.Drawing.Point(309, 75);
-            this.btnKelolaDokter.Name = "btnKelolaDokter";
-            this.btnKelolaDokter.Size = new System.Drawing.Size(187, 119);
-            this.btnKelolaDokter.TabIndex = 0;
-            this.btnKelolaDokter.UseVisualStyleBackColor = true;
-            this.btnKelolaDokter.Click += new System.EventHandler(this.btnKelolaDokter_Click);
-            // 
-            // btnPasien
-            // 
-            this.btnPasien.BackgroundImage = global::YasminClinic.Properties.Resources.patient;
-            this.btnPasien.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnPasien.Location = new System.Drawing.Point(74, 75);
-            this.btnPasien.Name = "btnPasien";
-            this.btnPasien.Size = new System.Drawing.Size(187, 119);
-            this.btnPasien.TabIndex = 0;
-            this.btnPasien.UseVisualStyleBackColor = true;
-            this.btnPasien.Click += new System.EventHandler(this.btnPasien_Click);
-            // 
-            // btnKelolaResepsionis
-            // 
-            this.btnKelolaResepsionis.BackgroundImage = global::YasminClinic.Properties.Resources.receptionist;
-            this.btnKelolaResepsionis.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnKelolaResepsionis.Location = new System.Drawing.Point(74, 238);
-            this.btnKelolaResepsionis.Name = "btnKelolaResepsionis";
-            this.btnKelolaResepsionis.Size = new System.Drawing.Size(187, 119);
-            this.btnKelolaResepsionis.TabIndex = 0;
-            this.btnKelolaResepsionis.UseVisualStyleBackColor = true;
-            this.btnKelolaResepsionis.Click += new System.EventHandler(this.btnKelolaResepsionis_Click);
-            // 
-            // btnreservasi
-            // 
-            this.btnreservasi.BackgroundImage = global::YasminClinic.Properties.Resources.reservation;
-            this.btnreservasi.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnreservasi.Location = new System.Drawing.Point(309, 238);
-            this.btnreservasi.Name = "btnreservasi";
-            this.btnreservasi.Size = new System.Drawing.Size(187, 119);
-            this.btnreservasi.TabIndex = 0;
-            this.btnreservasi.UseVisualStyleBackColor = true;
-            this.btnreservasi.Click += new System.EventHandler(this.btnreservasi_Click);
-            // 
-            // btnRekamMedis
-            // 
-            this.btnRekamMedis.BackgroundImage = global::YasminClinic.Properties.Resources.health_check;
-            this.btnRekamMedis.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnRekamMedis.Location = new System.Drawing.Point(543, 238);
-            this.btnRekamMedis.Name = "btnRekamMedis";
-            this.btnRekamMedis.Size = new System.Drawing.Size(187, 119);
-            this.btnRekamMedis.TabIndex = 0;
-            this.btnRekamMedis.UseVisualStyleBackColor = true;
-            this.btnRekamMedis.Click += new System.EventHandler(this.btnRekamMedis_Click);
             // 
             // label1
             // 
@@ -168,12 +105,113 @@
             this.label6.TabIndex = 1;
             this.label6.Text = "Kelola Rekam Medis";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Plus Jakarta Sans Medium", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(337, 525);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(139, 24);
+            this.label7.TabIndex = 1;
+            this.label7.Text = "Membuat laporan";
+            // 
+            // btnLogOut
+            // 
+            this.btnLogOut.BackgroundImage = global::YasminClinic.Properties.Resources.door;
+            this.btnLogOut.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnLogOut.Location = new System.Drawing.Point(29, 522);
+            this.btnLogOut.Name = "btnLogOut";
+            this.btnLogOut.Size = new System.Drawing.Size(71, 51);
+            this.btnLogOut.TabIndex = 6;
+            this.btnLogOut.UseVisualStyleBackColor = true;
+            this.btnLogOut.Click += new System.EventHandler(this.btnLogOut_Click_1);
+            // 
+            // btnReport
+            // 
+            this.btnReport.BackgroundImage = global::YasminClinic.Properties.Resources.report;
+            this.btnReport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnReport.Location = new System.Drawing.Point(309, 403);
+            this.btnReport.Name = "btnReport";
+            this.btnReport.Size = new System.Drawing.Size(187, 119);
+            this.btnReport.TabIndex = 2;
+            this.btnReport.UseVisualStyleBackColor = true;
+            this.btnReport.Click += new System.EventHandler(this.btnReport_Click_1);
+            // 
+            // btnRekamMedis
+            // 
+            this.btnRekamMedis.BackgroundImage = global::YasminClinic.Properties.Resources.health_check;
+            this.btnRekamMedis.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnRekamMedis.Location = new System.Drawing.Point(543, 238);
+            this.btnRekamMedis.Name = "btnRekamMedis";
+            this.btnRekamMedis.Size = new System.Drawing.Size(187, 119);
+            this.btnRekamMedis.TabIndex = 0;
+            this.btnRekamMedis.UseVisualStyleBackColor = true;
+            this.btnRekamMedis.Click += new System.EventHandler(this.btnRekamMedis_Click);
+            // 
+            // btnreservasi
+            // 
+            this.btnreservasi.BackgroundImage = global::YasminClinic.Properties.Resources.reservation;
+            this.btnreservasi.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnreservasi.Location = new System.Drawing.Point(309, 238);
+            this.btnreservasi.Name = "btnreservasi";
+            this.btnreservasi.Size = new System.Drawing.Size(187, 119);
+            this.btnreservasi.TabIndex = 0;
+            this.btnreservasi.UseVisualStyleBackColor = true;
+            this.btnreservasi.Click += new System.EventHandler(this.btnreservasi_Click);
+            // 
+            // btnKelolaResepsionis
+            // 
+            this.btnKelolaResepsionis.BackgroundImage = global::YasminClinic.Properties.Resources.receptionist;
+            this.btnKelolaResepsionis.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnKelolaResepsionis.Location = new System.Drawing.Point(74, 238);
+            this.btnKelolaResepsionis.Name = "btnKelolaResepsionis";
+            this.btnKelolaResepsionis.Size = new System.Drawing.Size(187, 119);
+            this.btnKelolaResepsionis.TabIndex = 0;
+            this.btnKelolaResepsionis.UseVisualStyleBackColor = true;
+            this.btnKelolaResepsionis.Click += new System.EventHandler(this.btnKelolaResepsionis_Click);
+            // 
+            // btnJadwalDokter
+            // 
+            this.btnJadwalDokter.BackgroundImage = global::YasminClinic.Properties.Resources.schedule;
+            this.btnJadwalDokter.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnJadwalDokter.Location = new System.Drawing.Point(543, 75);
+            this.btnJadwalDokter.Name = "btnJadwalDokter";
+            this.btnJadwalDokter.Size = new System.Drawing.Size(187, 119);
+            this.btnJadwalDokter.TabIndex = 0;
+            this.btnJadwalDokter.UseVisualStyleBackColor = true;
+            this.btnJadwalDokter.Click += new System.EventHandler(this.btnJadwalDokter_Click);
+            // 
+            // btnKelolaDokter
+            // 
+            this.btnKelolaDokter.BackgroundImage = global::YasminClinic.Properties.Resources.doctor;
+            this.btnKelolaDokter.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnKelolaDokter.Location = new System.Drawing.Point(309, 75);
+            this.btnKelolaDokter.Name = "btnKelolaDokter";
+            this.btnKelolaDokter.Size = new System.Drawing.Size(187, 119);
+            this.btnKelolaDokter.TabIndex = 0;
+            this.btnKelolaDokter.UseVisualStyleBackColor = true;
+            this.btnKelolaDokter.Click += new System.EventHandler(this.btnKelolaDokter_Click);
+            // 
+            // btnPasien
+            // 
+            this.btnPasien.BackgroundImage = global::YasminClinic.Properties.Resources.patient;
+            this.btnPasien.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnPasien.Location = new System.Drawing.Point(74, 75);
+            this.btnPasien.Name = "btnPasien";
+            this.btnPasien.Size = new System.Drawing.Size(187, 119);
+            this.btnPasien.TabIndex = 0;
+            this.btnPasien.UseVisualStyleBackColor = true;
+            this.btnPasien.Click += new System.EventHandler(this.btnPasien_Click);
+            // 
             // DashboardAdmin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 585);
+            this.Controls.Add(this.btnLogOut);
+            this.Controls.Add(this.btnReport);
             this.Controls.Add(this.label6);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label4);
@@ -187,6 +225,7 @@
             this.Controls.Add(this.btnPasien);
             this.Name = "DashboardAdmin";
             this.Text = "DashboardAdmin";
+            this.Load += new System.EventHandler(this.DashboardAdmin_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -206,5 +245,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button btnReport;
+        private System.Windows.Forms.Button btnLogOut;
     }
 }

@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DataSetKlinik" targetNamespace="http://tempuri.org/DataSetKlinik.xsd" xmlns:mstns="http://tempuri.org/DataSetKlinik.xsd" xmlns="http://tempuri.org/DataSetKlinik.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="YasminClinic2ConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="YasminClinic2ConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.YasminClinic.Properties.Settings.GlobalReference.Default.YasminClinic2ConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="DataTable1TableAdapter" GeneratorDataComponentClassName="DataTable1TableAdapter" Name="DataTable1" UserDataComponentName="DataTable1TableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="YasminClinic2ConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT r.ReservasiID, p.Nama AS NamaPasien, d.Nama AS NamaDokter, d.Spesialisasi, r.TanggalReservasi, r.JamReservasi, r.Status, rs.Nama AS DibuatOlehResepsionis
+FROM     Reservasi AS r INNER JOIN
+                  Pasien AS p ON r.PasienID = p.PasienID INNER JOIN
+                  Dokter AS d ON r.DokterID = d.DokterID INNER JOIN
+                  Resepsionis AS rs ON r.ResepsionisID = rs.ResepsionisID
+ORDER BY r.TanggalReservasi DESC, r.JamReservasi DESC; 
+</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="ReservasiID" DataSetColumn="ReservasiID" />
+              <Mapping SourceColumn="NamaPasien" DataSetColumn="NamaPasien" />
+              <Mapping SourceColumn="NamaDokter" DataSetColumn="NamaDokter" />
+              <Mapping SourceColumn="Spesialisasi" DataSetColumn="Spesialisasi" />
+              <Mapping SourceColumn="TanggalReservasi" DataSetColumn="TanggalReservasi" />
+              <Mapping SourceColumn="JamReservasi" DataSetColumn="JamReservasi" />
+              <Mapping SourceColumn="Status" DataSetColumn="Status" />
+              <Mapping SourceColumn="DibuatOlehResepsionis" DataSetColumn="DibuatOlehResepsionis" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DataSetKlinik" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_UserDSName="DataSetKlinik" msprop:Generator_DataSetName="DataSetKlinik">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DataTable1" msprop:Generator_RowEvHandlerName="DataTable1RowChangeEventHandler" msprop:Generator_RowDeletedName="DataTable1RowDeleted" msprop:Generator_RowDeletingName="DataTable1RowDeleting" msprop:Generator_RowEvArgName="DataTable1RowChangeEvent" msprop:Generator_TablePropName="DataTable1" msprop:Generator_RowChangedName="DataTable1RowChanged" msprop:Generator_RowChangingName="DataTable1RowChanging" msprop:Generator_TableClassName="DataTable1DataTable" msprop:Generator_RowClassName="DataTable1Row" msprop:Generator_TableVarName="tableDataTable1" msprop:Generator_UserTableName="DataTable1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ReservasiID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnPropNameInRow="ReservasiID" msprop:Generator_ColumnPropNameInTable="ReservasiIDColumn" msprop:Generator_ColumnVarNameInTable="columnReservasiID" msprop:Generator_UserColumnName="ReservasiID" type="xs:int" />
+              <xs:element name="NamaPasien" msprop:Generator_ColumnPropNameInRow="NamaPasien" msprop:Generator_ColumnPropNameInTable="NamaPasienColumn" msprop:Generator_ColumnVarNameInTable="columnNamaPasien" msprop:Generator_UserColumnName="NamaPasien">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="NamaDokter" msprop:Generator_ColumnPropNameInRow="NamaDokter" msprop:Generator_ColumnPropNameInTable="NamaDokterColumn" msprop:Generator_ColumnVarNameInTable="columnNamaDokter" msprop:Generator_UserColumnName="NamaDokter">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Spesialisasi" msprop:Generator_ColumnPropNameInRow="Spesialisasi" msprop:Generator_ColumnPropNameInTable="SpesialisasiColumn" msprop:Generator_ColumnVarNameInTable="columnSpesialisasi" msprop:Generator_UserColumnName="Spesialisasi">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TanggalReservasi" msprop:Generator_ColumnPropNameInRow="TanggalReservasi" msprop:Generator_ColumnPropNameInTable="TanggalReservasiColumn" msprop:Generator_ColumnVarNameInTable="columnTanggalReservasi" msprop:Generator_UserColumnName="TanggalReservasi" type="xs:dateTime" />
+              <xs:element name="JamReservasi" msprop:Generator_ColumnPropNameInRow="JamReservasi" msprop:Generator_ColumnPropNameInTable="JamReservasiColumn" msprop:Generator_ColumnVarNameInTable="columnJamReservasi" msprop:Generator_UserColumnName="JamReservasi" type="xs:duration" />
+              <xs:element name="Status" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnPropNameInTable="StatusColumn" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_UserColumnName="Status">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DibuatOlehResepsionis" msprop:Generator_ColumnPropNameInRow="DibuatOlehResepsionis" msprop:Generator_ColumnPropNameInTable="DibuatOlehResepsionisColumn" msprop:Generator_ColumnVarNameInTable="columnDibuatOlehResepsionis" msprop:Generator_UserColumnName="DibuatOlehResepsionis">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:DataTable1" />
+      <xs:field xpath="mstns:ReservasiID" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

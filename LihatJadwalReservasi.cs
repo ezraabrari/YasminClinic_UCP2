@@ -195,7 +195,6 @@ namespace YasminClinic
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            // Kembali ke dashboard resepsionis
             DashboardDokter DashboardDokter = new DashboardDokter();
             DashboardDokter.Show();
             this.Hide();

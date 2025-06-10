@@ -41,10 +41,10 @@
             this.txtTindakan = new System.Windows.Forms.TextBox();
             this.txtResep = new System.Windows.Forms.TextBox();
             this.dgvRekamMedis = new System.Windows.Forms.DataGridView();
-            this.btnBack = new System.Windows.Forms.Button();
             this.btnSimpan = new System.Windows.Forms.Button();
             this.btnUpdate = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
+            this.btnBack = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvRekamMedis)).BeginInit();
             this.SuspendLayout();
             // 
@@ -169,17 +169,6 @@
             this.dgvRekamMedis.TabIndex = 4;
             this.dgvRekamMedis.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvRekamMedis_CellClick);
             // 
-            // btnBack
-            // 
-            this.btnBack.BackgroundImage = global::YasminClinic.Properties.Resources.undo;
-            this.btnBack.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnBack.Location = new System.Drawing.Point(36, 396);
-            this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(87, 42);
-            this.btnBack.TabIndex = 27;
-            this.btnBack.UseVisualStyleBackColor = true;
-            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
-            // 
             // btnSimpan
             // 
             this.btnSimpan.Location = new System.Drawing.Point(48, 309);
@@ -202,13 +191,24 @@
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(308, 309);
+            this.btnRefresh.Location = new System.Drawing.Point(357, 309);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(86, 36);
             this.btnRefresh.TabIndex = 28;
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
+            // btnBack
+            // 
+            this.btnBack.BackgroundImage = global::YasminClinic.Properties.Resources.undo;
+            this.btnBack.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnBack.Location = new System.Drawing.Point(36, 396);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(87, 42);
+            this.btnBack.TabIndex = 27;
+            this.btnBack.UseVisualStyleBackColor = true;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
             // RekamMedis
             // 

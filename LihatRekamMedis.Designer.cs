@@ -32,6 +32,7 @@
             this.btnBack = new System.Windows.Forms.Button();
             this.btnDebug = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnImport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvRekamMedis)).BeginInit();
             this.SuspendLayout();
             // 
@@ -61,27 +62,37 @@
             // 
             this.btnDebug.Location = new System.Drawing.Point(468, 386);
             this.btnDebug.Name = "btnDebug";
-            this.btnDebug.Size = new System.Drawing.Size(75, 23);
+            this.btnDebug.Size = new System.Drawing.Size(87, 37);
             this.btnDebug.TabIndex = 2;
             this.btnDebug.Text = "Debug";
             this.btnDebug.UseVisualStyleBackColor = true;
-            this.btnDebug.Click += new System.EventHandler(this.btnDebugCheck_Click);
             // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(576, 386);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(87, 37);
             this.button1.TabIndex = 2;
             this.button1.Text = "Refresh";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
+            // btnImport
+            // 
+            this.btnImport.Location = new System.Drawing.Point(356, 386);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(87, 37);
+            this.btnImport.TabIndex = 3;
+            this.btnImport.Text = "Import";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
             // 
             // LihatRekamMedis
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnImport);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnDebug);
             this.Controls.Add(this.btnBack);
@@ -99,5 +110,6 @@
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Button btnDebug;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnImport;
     }
 }

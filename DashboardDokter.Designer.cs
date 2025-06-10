@@ -28,35 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnRekamMedis = new System.Windows.Forms.Button();
-            this.btnReservation = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnLogOut = new System.Windows.Forms.Button();
+            this.btnReservation = new System.Windows.Forms.Button();
+            this.btnRekamMedis = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // btnRekamMedis
-            // 
-            this.btnRekamMedis.BackColor = System.Drawing.Color.White;
-            this.btnRekamMedis.BackgroundImage = global::YasminClinic.Properties.Resources.health_check;
-            this.btnRekamMedis.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnRekamMedis.Location = new System.Drawing.Point(55, 54);
-            this.btnRekamMedis.Name = "btnRekamMedis";
-            this.btnRekamMedis.Size = new System.Drawing.Size(146, 105);
-            this.btnRekamMedis.TabIndex = 0;
-            this.btnRekamMedis.UseVisualStyleBackColor = false;
-            this.btnRekamMedis.Click += new System.EventHandler(this.btnRekamMedis_Click);
-            // 
-            // btnReservation
-            // 
-            this.btnReservation.BackColor = System.Drawing.Color.White;
-            this.btnReservation.BackgroundImage = global::YasminClinic.Properties.Resources.reservation;
-            this.btnReservation.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnReservation.Location = new System.Drawing.Point(271, 54);
-            this.btnReservation.Name = "btnReservation";
-            this.btnReservation.Size = new System.Drawing.Size(146, 105);
-            this.btnReservation.TabIndex = 0;
-            this.btnReservation.UseVisualStyleBackColor = false;
-            this.btnReservation.Click += new System.EventHandler(this.btnReservation_Click);
             // 
             // label1
             // 
@@ -78,11 +55,47 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Lihat Jadwal Reservasi";
             // 
+            // btnLogOut
+            // 
+            this.btnLogOut.BackgroundImage = global::YasminClinic.Properties.Resources.door;
+            this.btnLogOut.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnLogOut.Location = new System.Drawing.Point(55, 224);
+            this.btnLogOut.Name = "btnLogOut";
+            this.btnLogOut.Size = new System.Drawing.Size(54, 41);
+            this.btnLogOut.TabIndex = 6;
+            this.btnLogOut.UseVisualStyleBackColor = true;
+            this.btnLogOut.Click += new System.EventHandler(this.btnLogOut_Click);
+            // 
+            // btnReservation
+            // 
+            this.btnReservation.BackColor = System.Drawing.Color.White;
+            this.btnReservation.BackgroundImage = global::YasminClinic.Properties.Resources.reservation;
+            this.btnReservation.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnReservation.Location = new System.Drawing.Point(271, 54);
+            this.btnReservation.Name = "btnReservation";
+            this.btnReservation.Size = new System.Drawing.Size(146, 105);
+            this.btnReservation.TabIndex = 0;
+            this.btnReservation.UseVisualStyleBackColor = false;
+            this.btnReservation.Click += new System.EventHandler(this.btnReservation_Click);
+            // 
+            // btnRekamMedis
+            // 
+            this.btnRekamMedis.BackColor = System.Drawing.Color.White;
+            this.btnRekamMedis.BackgroundImage = global::YasminClinic.Properties.Resources.health_check;
+            this.btnRekamMedis.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnRekamMedis.Location = new System.Drawing.Point(55, 54);
+            this.btnRekamMedis.Name = "btnRekamMedis";
+            this.btnRekamMedis.Size = new System.Drawing.Size(146, 105);
+            this.btnRekamMedis.TabIndex = 0;
+            this.btnRekamMedis.UseVisualStyleBackColor = false;
+            this.btnRekamMedis.Click += new System.EventHandler(this.btnRekamMedis_Click);
+            // 
             // DashboardDokter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(493, 233);
+            this.ClientSize = new System.Drawing.Size(510, 277);
+            this.Controls.Add(this.btnLogOut);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnReservation);
@@ -100,5 +113,6 @@
         private System.Windows.Forms.Button btnReservation;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnLogOut;
     }
 }

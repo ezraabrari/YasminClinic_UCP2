@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Windows.Forms;
+// PERBAIKAN: Menambahkan using directive untuk NPOI
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 namespace YasminClinic
 {
@@ -29,7 +34,6 @@ namespace YasminClinic
                 {
                     connection.Open();
 
-                    // Gunakan query langsung untuk debugging
                     string query = @"
                         SELECT 
                             rm.RekamMedisID,
@@ -52,25 +56,13 @@ namespace YasminClinic
                         var dt = new DataTable();
                         adapter.Fill(dt);
 
-                        if (dt.Rows.Count == 0)
-                        {
-                            MessageBox.Show("Tidak ada data rekam medis yang ditemukan.", "Informasi",
-                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show($"Berhasil memuat {dt.Rows.Count} data rekam medis.", "Sukses",
-                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-
                         dgvRekamMedis.DataSource = dt;
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat data rekam medis: " + ex.Message + "\n\nDetail: " + ex.StackTrace,
-                              "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Gagal memuat data rekam medis: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -78,53 +70,20 @@ namespace YasminClinic
         {
             try
             {
-                // Konfigurasi tampilan DataGridView
                 dgvRekamMedis.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 dgvRekamMedis.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
                 dgvRekamMedis.MultiSelect = false;
                 dgvRekamMedis.ReadOnly = true;
                 dgvRekamMedis.AllowUserToAddRows = false;
-                dgvRekamMedis.AllowUserToDeleteRows = false;
 
-                // Sembunyikan kolom ID jika ada
                 if (dgvRekamMedis.Columns["RekamMedisID"] != null)
                 {
                     dgvRekamMedis.Columns["RekamMedisID"].Visible = false;
                 }
-
-                // Atur lebar kolom
-                if (dgvRekamMedis.Columns["Nama Pasien"] != null)
-                    dgvRekamMedis.Columns["Nama Pasien"].FillWeight = 80;
-
-                if (dgvRekamMedis.Columns["Nama Dokter"] != null)
-                    dgvRekamMedis.Columns["Nama Dokter"].FillWeight = 80;
-
-                if (dgvRekamMedis.Columns["Spesialisasi"] != null)
-                    dgvRekamMedis.Columns["Spesialisasi"].FillWeight = 60;
-
-                if (dgvRekamMedis.Columns["Tanggal"] != null)
-                {
-                    dgvRekamMedis.Columns["Tanggal"].FillWeight = 60;
-                    dgvRekamMedis.Columns["Tanggal"].DefaultCellStyle.Format = "dd/MM/yyyy";
-                }
-
-                if (dgvRekamMedis.Columns["Keluhan"] != null)
-                    dgvRekamMedis.Columns["Keluhan"].FillWeight = 100;
-
-                if (dgvRekamMedis.Columns["Diagnosa"] != null)
-                    dgvRekamMedis.Columns["Diagnosa"].FillWeight = 100;
-
-                if (dgvRekamMedis.Columns["Tindakan"] != null)
-                    dgvRekamMedis.Columns["Tindakan"].FillWeight = 100;
-
-                if (dgvRekamMedis.Columns["Resep"] != null)
-                    dgvRekamMedis.Columns["Resep"].FillWeight = 100;
-
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error dalam setup DataGridView: " + ex.Message, "Error",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error dalam setup DataGridView: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -142,65 +101,67 @@ namespace YasminClinic
 
         private void dgvRekamMedis_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Event handler untuk klik sel - bisa dikembangkan untuk detail view
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dgvRekamMedis.Rows[e.RowIndex];
                 string namaPasien = row.Cells["Nama Pasien"].Value?.ToString() ?? "";
-                string tanggal = row.Cells["Tanggal"].Value?.ToString() ?? "";
+                string tanggal = Convert.ToDateTime(row.Cells["Tanggal"].Value).ToString("dd MMMM yyyy");
 
                 MessageBox.Show($"Detail Rekam Medis:\nPasien: {namaPasien}\nTanggal: {tanggal}",
-                              "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                 "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
-        // Method untuk debugging - bisa dihapus setelah selesai
-        private void btnDebugCheck_Click(object sender, EventArgs e)
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFile = new OpenFileDialog())
+            {
+                openFile.Filter = "Excel Files|*.xlsx;*.xls";
+                if (openFile.ShowDialog() == DialogResult.OK)
+                {
+                    PreviewData(openFile.FileName);
+                }
+            }
+        }
+
+        private void PreviewData(string filePath)
         {
             try
             {
-                using (var connection = new SqlConnection(connectionString))
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    connection.Open();
+                    IWorkbook workbook = new XSSFWorkbook(fs);
+                    ISheet sheet = workbook.GetSheetAt(0);
+                    DataTable dt = new DataTable();
 
-                    // Cek jumlah data di setiap tabel
-                    var commands = new[]
+                    IRow headerRow = sheet.GetRow(0);
+                    foreach (var cell in headerRow.Cells)
                     {
-                        "SELECT COUNT(*) FROM RekamMedis",
-                        "SELECT COUNT(*) FROM Pasien",
-                        "SELECT COUNT(*) FROM Dokter"
-                    };
-
-                    string result = "Debug Info:\n";
-
-                    foreach (var cmdText in commands)
-                    {
-                        using (var cmd = new SqlCommand(cmdText, connection))
-                        {
-                            int count = (int)cmd.ExecuteScalar();
-                            result += $"{cmdText}: {count} rows\n";
-                        }
+                        dt.Columns.Add(cell.ToString());
                     }
 
-                    // Cek data rekam medis spesifik
-                    using (var cmd = new SqlCommand("SELECT TOP 5 * FROM RekamMedis", connection))
+                    for (int i = 1; i <= sheet.LastRowNum; i++)
                     {
-                        using (var reader = cmd.ExecuteReader())
+                        IRow row = sheet.GetRow(i);
+                        if (row == null) continue;
+
+                        DataRow dr = dt.NewRow();
+                        for (int j = 0; j < dt.Columns.Count && j < row.Cells.Count; j++)
                         {
-                            result += "\nSample RekamMedis data:\n";
-                            while (reader.Read())
-                            {
-                                result += $"ID: {reader["RekamMedisID"]}, PasienID: {reader["PasienID"]}, DokterID: {reader["DokterID"]}\n";
-                            }
+                            dr[j] = row.Cells[j]?.ToString() ?? "";
                         }
+                        dt.Rows.Add(dr);
                     }
 
-                    MessageBox.Show(result, "Debug Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        
+                     PreviewForm previewForm = new PreviewForm(dt);
+                     previewForm.ShowDialog();
+                    MessageBox.Show("Data dari Excel berhasil dibaca dan siap diproses.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Debug error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error membaca file Excel: " + ex.Message);
             }
         }
     }

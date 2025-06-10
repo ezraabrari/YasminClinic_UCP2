@@ -24,20 +24,22 @@ namespace YasminClinic
 
         private void btnPasien_Click(object sender, EventArgs e)
         {
-            Pasien Pasien = new Pasien();
-            Pasien.Show();
+            KelolaPasien KelolaPasien = new KelolaPasien();
+            KelolaPasien.Show();
             this.Hide();
         }
 
         private void btnKelolaDokter_Click(object sender, EventArgs e)
         {
-
+            KelolaDokter KelolaDokter = new KelolaDokter();
+            KelolaDokter.Show();
+            this.Hide();
         }
 
         private void btnJadwalDokter_Click(object sender, EventArgs e)
         {
-            Resepsionis Resepsionis = new Resepsionis();
-            Resepsionis.Show();
+            JadwalDokter JadwalDokter = new JadwalDokter();
+            JadwalDokter.Show();
             this.Hide();
         }
 
@@ -50,16 +52,35 @@ namespace YasminClinic
 
         private void btnreservasi_Click(object sender, EventArgs e)
         {
-            Reservasi Reservasi = new Reservasi();
-            Reservasi.Show();
+            KelolaReservation KelolaReservation = new KelolaReservation();
+            KelolaReservation.Show();
             this.Hide();
-
-
         }
 
         private void btnRekamMedis_Click(object sender, EventArgs e)
         {
+            KelolaRekamMedis KelolaRekamMedis = new KelolaRekamMedis();
+            KelolaRekamMedis.Show();
+            this.Hide();
+        }
 
+        private void DashboardAdmin_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnReport_Click_1(object sender, EventArgs e)
+        {
+            Report Report = new Report();
+            Report.Show();
+            this.Hide();
+        }
+
+        private void btnLogOut_Click_1(object sender, EventArgs e)
+        {
+            FormLogin FormLogin = new FormLogin();
+            FormLogin.Show();
+            this.Hide();
         }
     }
 }

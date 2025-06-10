@@ -30,5 +30,12 @@ namespace YasminClinic
             LihatJadwalReservasi.Show();
             this.Hide();
         }
+
+        private void btnLogOut_Click(object sender, EventArgs e)
+        {
+            FormLogin FormLogin = new FormLogin();
+            FormLogin.Show();
+            this.Hide();
+        }
     }
 }
