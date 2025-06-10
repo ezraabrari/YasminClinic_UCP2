@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A4B7C0E1-4869-4AB6-88F8-DE9EF44D2600}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>YasminClinic</RootNamespace>
+    <AssemblyName>YasminClinic</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DashboardAdmin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DashboardAdmin.Designer.cs">
+      <DependentUpon>DashboardAdmin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DashboardDokter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DashboardDokter.Designer.cs">
+      <DependentUpon>DashboardDokter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DashboardResepsionis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DashboardResepsionis.Designer.cs">
+      <DependentUpon>DashboardResepsionis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLogin.Designer.cs">
+      <DependentUpon>FormLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HalamanUtama.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HalamanUtama.Designer.cs">
+      <DependentUpon>HalamanUtama.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LihatJadwalReservasi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LihatJadwalReservasi.Designer.cs">
+      <DependentUpon>LihatJadwalReservasi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LihatRekamMedis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LihatRekamMedis.Designer.cs">
+      <DependentUpon>LihatRekamMedis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pasien.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Pasien.Designer.cs">
+      <DependentUpon>Pasien.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RekamMedis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RekamMedis.Designer.cs">
+      <DependentUpon>RekamMedis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Resepsionis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Resepsionis.Designer.cs">
+      <DependentUpon>Resepsionis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reservasi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reservasi.Designer.cs">
+      <DependentUpon>Reservasi.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="DashboardAdmin.resx">
+      <DependentUpon>DashboardAdmin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DashboardDokter.resx">
+      <DependentUpon>DashboardDokter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DashboardResepsionis.resx">
+      <DependentUpon>DashboardResepsionis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLogin.resx">
+      <DependentUpon>FormLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HalamanUtama.resx">
+      <DependentUpon>HalamanUtama.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LihatJadwalReservasi.resx">
+      <DependentUpon>LihatJadwalReservasi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LihatRekamMedis.resx">
+      <DependentUpon>LihatRekamMedis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Pasien.resx">
+      <DependentUpon>Pasien.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="RekamMedis.resx">
+      <DependentUpon>RekamMedis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resepsionis.resx">
+      <DependentUpon>Resepsionis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reservasi.resx">
+      <DependentUpon>Reservasi.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\receptionist.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\doctor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\administrator.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\browser.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\reservation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\patient.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\health-check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\schedule.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
