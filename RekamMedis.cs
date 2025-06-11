@@ -10,9 +10,6 @@ namespace YasminClinic
         private static readonly string connectionString = "Data Source=LAPTOP-D0UNNI5Q\\ZYAA;" +
                                                           "Initial Catalog=YasminClinic2; Integrated Security=True";
 
-        // PENTING: Nantinya, nilai ini harus Anda dapatkan dari form login
-        // untuk menentukan dokter mana yang sedang menggunakan aplikasi.
-        // Contoh: ID 1 untuk Ahmad Sulaiman, ID 2 untuk Nina Yusuf
         private int loggedInDokterID = 1;
 
         private int selectedRekamMedisID = 0;
