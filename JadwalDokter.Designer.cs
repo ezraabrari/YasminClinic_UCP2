@@ -36,12 +36,13 @@
             this.btnupdate = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
             this.btnSimpan = new System.Windows.Forms.Button();
-            this.cmbDokter = new System.Windows.Forms.ComboBox();
             this.cmbHari = new System.Windows.Forms.ComboBox();
             this.dtmJamMulai = new System.Windows.Forms.DateTimePicker();
             this.dtmJamSelesai = new System.Windows.Forms.DateTimePicker();
             this.btnBack = new System.Windows.Forms.Button();
             this.dgvJadwal = new System.Windows.Forms.DataGridView();
+            this.btnAnalyze = new System.Windows.Forms.Button();
+            this.txtDokter = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvJadwal)).BeginInit();
             this.SuspendLayout();
             // 
@@ -121,15 +122,6 @@
             this.btnSimpan.UseVisualStyleBackColor = true;
             this.btnSimpan.Click += new System.EventHandler(this.btnSimpan_Click);
             // 
-            // cmbDokter
-            // 
-            this.cmbDokter.FormattingEnabled = true;
-            this.cmbDokter.Location = new System.Drawing.Point(215, 42);
-            this.cmbDokter.Name = "cmbDokter";
-            this.cmbDokter.Size = new System.Drawing.Size(293, 24);
-            this.cmbDokter.TabIndex = 48;
-            this.cmbDokter.SelectedIndexChanged += new System.EventHandler(this.cmbDokter_SelectedIndexChanged);
-            // 
             // cmbHari
             // 
             this.cmbHari.FormattingEnabled = true;
@@ -177,18 +169,37 @@
             this.dgvJadwal.TabIndex = 51;
             this.dgvJadwal.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvJadwal_CellClick);
             // 
+            // btnAnalyze
+            // 
+            this.btnAnalyze.Location = new System.Drawing.Point(252, 317);
+            this.btnAnalyze.Name = "btnAnalyze";
+            this.btnAnalyze.Size = new System.Drawing.Size(92, 38);
+            this.btnAnalyze.TabIndex = 45;
+            this.btnAnalyze.Text = "analyze";
+            this.btnAnalyze.UseVisualStyleBackColor = true;
+            this.btnAnalyze.Click += new System.EventHandler(this.btnAnalyze_Click);
+            // 
+            // txtDokter
+            // 
+            this.txtDokter.Location = new System.Drawing.Point(215, 44);
+            this.txtDokter.Name = "txtDokter";
+            this.txtDokter.Size = new System.Drawing.Size(293, 22);
+            this.txtDokter.TabIndex = 52;
+            this.txtDokter.TextChanged += new System.EventHandler(this.txtDokter_TextChanged);
+            // 
             // JadwalDokter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1232, 450);
+            this.Controls.Add(this.txtDokter);
             this.Controls.Add(this.dgvJadwal);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.dtmJamSelesai);
             this.Controls.Add(this.dtmJamMulai);
             this.Controls.Add(this.cmbHari);
-            this.Controls.Add(this.cmbDokter);
             this.Controls.Add(this.btnRefresh);
+            this.Controls.Add(this.btnAnalyze);
             this.Controls.Add(this.btnupdate);
             this.Controls.Add(this.btnHapus);
             this.Controls.Add(this.btnSimpan);
@@ -200,6 +211,7 @@
             this.Text = "JadwalDokter";
             ((System.ComponentModel.ISupportInitialize)(this.dgvJadwal)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -213,11 +225,12 @@
         private System.Windows.Forms.Button btnupdate;
         private System.Windows.Forms.Button btnHapus;
         private System.Windows.Forms.Button btnSimpan;
-        private System.Windows.Forms.ComboBox cmbDokter;
         private System.Windows.Forms.ComboBox cmbHari;
         private System.Windows.Forms.DateTimePicker dtmJamMulai;
         private System.Windows.Forms.DateTimePicker dtmJamSelesai;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.DataGridView dgvJadwal;
+        private System.Windows.Forms.Button btnAnalyze;
+        private System.Windows.Forms.TextBox txtDokter;
     }
 }

@@ -45,7 +45,6 @@
             this.dgvRekamMedis.RowTemplate.Height = 24;
             this.dgvRekamMedis.Size = new System.Drawing.Size(726, 339);
             this.dgvRekamMedis.TabIndex = 0;
-            this.dgvRekamMedis.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvRekamMedis_CellContentClick);
             // 
             // btnBack
             // 

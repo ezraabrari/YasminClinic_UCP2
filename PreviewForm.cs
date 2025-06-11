@@ -7,8 +7,8 @@ namespace YasminClinic
 {
     public partial class PreviewForm : Form
     {
-        private string connectionString = "Data Source=LAPTOP-D0UNNI5Q\\ZYAA;Initial Catalog=YasminClinic2;Integrated Security=True";
-        private DataTable dataTable;
+        private static readonly string connectionString = "Data Source=LAPTOP-D0UNNI5Q\\ZYAA;" +
+                                                          "Initial Catalog=YasminClinic2; Integrated Security=True";
 
         public PreviewForm(DataTable data)
         {
@@ -18,107 +18,78 @@ namespace YasminClinic
 
         private void PreviewForm_Load(object sender, EventArgs e)
         {
-            dgvPreview.AutoResizeColumns();
+            dgvPreview.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnImportToDb_Click(object sender, EventArgs e) // Ganti nama tombol di designer menjadi btnImportToDb
         {
-            DialogResult result = MessageBox.Show("Apakah Anda ingin mengimpor data ini ke database?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            DataTable dt = (DataTable)dgvPreview.DataSource;
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                MessageBox.Show("Tidak ada data untuk diimpor.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
+            DialogResult result = MessageBox.Show($"Anda akan mengimpor {dt.Rows.Count} baris data. Lanjutkan?", "Konfirmasi Impor", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                ImportDataToDatabase();
+                ImportDataToDatabase(dt);
             }
         }
 
-        private bool ValidateRow(DataRow row)
+        private void ImportDataToDatabase(DataTable dt)
         {
-            // Validasi dasar: pastikan kolom tidak kosong
-            if (string.IsNullOrWhiteSpace(row["PasienID"].ToString()) ||
-                string.IsNullOrWhiteSpace(row["DokterID"].ToString()) ||
-                string.IsNullOrWhiteSpace(row["Tanggal"].ToString()))
+            int successCount = 0;
+            int failedCount = 0;
+
+            // PERBAIKAN TOTAL: Menggunakan transaksi agar proses impor bersifat "All or Nothing"
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                MessageBox.Show("PasienID, DokterID, dan Tanggal wajib diisi.", "Validasi Gagal", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+                conn.Open();
+                SqlTransaction transaction = conn.BeginTransaction(); // Mulai transaksi
 
-            return true;
-        }
-
-        private void ImportDataToDatabase()
-        {
-            try
-            {
-                DataTable dt = (DataTable)dgvPreview.DataSource;
-
-                foreach (DataRow row in dt.Rows)
+                try
                 {
-                    string namaPasien = row["NamaPasien"].ToString();
-                    int dokterID;
-
-                    if (!int.TryParse(row["DokterID"].ToString(), out dokterID))
+                    foreach (DataRow row in dt.Rows)
                     {
-                        MessageBox.Show($"DokterID tidak valid untuk pasien {namaPasien}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        continue;
-                    }
-
-                    int pasienID = GetPasienIDByName(namaPasien);
-                    if (pasienID == -1)
-                    {
-                        MessageBox.Show($"Pasien '{namaPasien}' tidak ditemukan di database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        continue;
-                    }
-
-                    string query = @"INSERT INTO RekamMedis 
-                             (PasienID, DokterID, Tanggal, Keluhan, Diagnosa, Tindakan, Resep)
-                             VALUES (@PasienID, @DokterID, @Tanggal, @Keluhan, @Diagnosa, @Tindakan, @Resep)";
-
-                    using (SqlConnection conn = new SqlConnection(connectionString))
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        // Validasi baris data
+                        if (!int.TryParse(row["ReservasiID"]?.ToString(), out int reservasiID))
                         {
-                            cmd.Parameters.AddWithValue("@PasienID", pasienID);
-                            cmd.Parameters.AddWithValue("@DokterID", dokterID);
-                            cmd.Parameters.AddWithValue("@Tanggal", Convert.ToDateTime(row["Tanggal"]));
+                            // Lewati baris jika ReservasiID tidak valid
+                            failedCount++;
+                            continue;
+                        }
+
+                        // Panggil Stored Procedure yang sudah kita buat
+                        using (SqlCommand cmd = new SqlCommand("sp_AddRekamMedis", conn, transaction))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@ReservasiID", reservasiID);
                             cmd.Parameters.AddWithValue("@Keluhan", row["Keluhan"]?.ToString() ?? "");
                             cmd.Parameters.AddWithValue("@Diagnosa", row["Diagnosa"]?.ToString() ?? "");
                             cmd.Parameters.AddWithValue("@Tindakan", row["Tindakan"]?.ToString() ?? "");
                             cmd.Parameters.AddWithValue("@Resep", row["Resep"]?.ToString() ?? "");
+
                             cmd.ExecuteNonQuery();
+                            successCount++;
                         }
                     }
+
+                    transaction.Commit(); // Jika semua berhasil, simpan perubahan
+                    MessageBox.Show($"Impor Selesai.\n\nBerhasil: {successCount} baris\nGagal/Dilewati: {failedCount} baris", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
                 }
-
-                MessageBox.Show("Data berhasil diimpor ke database.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal mengimpor data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-
-        private int GetPasienIDByName(string nama)
-        {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                string query = "SELECT PasienID FROM Pasien WHERE Nama = @Nama";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                catch (SqlException ex)
                 {
-                    cmd.Parameters.AddWithValue("@Nama", nama);
-                    var result = cmd.ExecuteScalar();
-                    return result != null ? Convert.ToInt32(result) : -1;
+                    transaction.Rollback(); // Jika ada satu saja error, batalkan semua
+                    MessageBox.Show("Gagal mengimpor data karena error database. Semua perubahan telah dibatalkan.\n\nError: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback(); // Batalkan juga untuk error lainnya
+                    MessageBox.Show("Gagal mengimpor data. Semua perubahan telah dibatalkan.\n\nError: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-        }
-
-
-        private void dgvPreview_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            // Tidak digunakan, bisa dihapus jika tidak diperlukan
         }
     }
 }

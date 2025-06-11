@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Windows.Forms;
-// PERBAIKAN: Menambahkan using directive untuk NPOI
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -30,34 +28,16 @@ namespace YasminClinic
         {
             try
             {
+                // PERBAIKAN: Menggunakan Stored Procedure yang sudah dioptimalkan
+                // dan menambahkan ReservasiID untuk keperluan ekspor.
                 using (var connection = new SqlConnection(connectionString))
+                using (var command = new SqlCommand("sp_GetAllRekamMedisDetails", connection))
                 {
-                    connection.Open();
-
-                    string query = @"
-                        SELECT 
-                            rm.RekamMedisID,
-                            p.Nama AS [Nama Pasien],
-                            d.Nama AS [Nama Dokter],
-                            d.Spesialisasi,
-                            rm.Tanggal,
-                            rm.Keluhan,
-                            rm.Diagnosa,
-                            rm.Tindakan,
-                            rm.Resep
-                        FROM RekamMedis rm
-                        INNER JOIN Pasien p ON rm.PasienID = p.PasienID
-                        INNER JOIN Dokter d ON rm.DokterID = d.DokterID
-                        ORDER BY rm.Tanggal DESC, p.Nama";
-
-                    using (var command = new SqlCommand(query, connection))
-                    {
-                        var adapter = new SqlDataAdapter(command);
-                        var dt = new DataTable();
-                        adapter.Fill(dt);
-
-                        dgvRekamMedis.DataSource = dt;
-                    }
+                    command.CommandType = CommandType.StoredProcedure;
+                    var adapter = new SqlDataAdapter(command);
+                    var dt = new DataTable();
+                    adapter.Fill(dt);
+                    dgvRekamMedis.DataSource = dt;
                 }
             }
             catch (Exception ex)
@@ -68,23 +48,18 @@ namespace YasminClinic
 
         private void SetupDataGridView()
         {
-            try
-            {
-                dgvRekamMedis.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dgvRekamMedis.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-                dgvRekamMedis.MultiSelect = false;
-                dgvRekamMedis.ReadOnly = true;
-                dgvRekamMedis.AllowUserToAddRows = false;
+            dgvRekamMedis.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvRekamMedis.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvRekamMedis.MultiSelect = false;
+            dgvRekamMedis.ReadOnly = true;
+            dgvRekamMedis.AllowUserToAddRows = false;
 
-                if (dgvRekamMedis.Columns["RekamMedisID"] != null)
-                {
-                    dgvRekamMedis.Columns["RekamMedisID"].Visible = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error dalam setup DataGridView: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            // Sembunyikan kolom ID yang tidak perlu dilihat pengguna
+            if (dgvRekamMedis.Columns["RekamMedisID"] != null)
+                dgvRekamMedis.Columns["RekamMedisID"].Visible = false;
+
+            if (dgvRekamMedis.Columns["ReservasiID"] != null)
+                dgvRekamMedis.Columns["ReservasiID"].Visible = false;
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -92,23 +67,55 @@ namespace YasminClinic
             LoadDataRekamMedis();
         }
 
-        private void btnBack_Click(object sender, EventArgs e)
+        // --- PENAMBAHAN FUNGSI EKSPOR ---
+        private void btnExport_Click(object sender, EventArgs e)
         {
-            DashboardResepsionis dashboard = new DashboardResepsionis();
-            dashboard.Show();
-            this.Hide();
-        }
-
-        private void dgvRekamMedis_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
+            if (dgvRekamMedis.Rows.Count == 0)
             {
-                DataGridViewRow row = dgvRekamMedis.Rows[e.RowIndex];
-                string namaPasien = row.Cells["Nama Pasien"].Value?.ToString() ?? "";
-                string tanggal = Convert.ToDateTime(row.Cells["Tanggal"].Value).ToString("dd MMMM yyyy");
+                MessageBox.Show("Tidak ada data untuk diekspor.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
-                MessageBox.Show($"Detail Rekam Medis:\nPasien: {namaPasien}\nTanggal: {tanggal}",
-                                 "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            using (SaveFileDialog saveFile = new SaveFileDialog())
+            {
+                saveFile.Filter = "Excel Files|*.xlsx";
+                saveFile.Title = "Simpan File Rekam Medis";
+                if (saveFile.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        IWorkbook workbook = new XSSFWorkbook();
+                        ISheet sheet = workbook.CreateSheet("RekamMedis");
+
+                        // Buat Header
+                        IRow headerRow = sheet.CreateRow(0);
+                        DataTable dt = (DataTable)dgvRekamMedis.DataSource;
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            headerRow.CreateCell(i).SetCellValue(dt.Columns[i].ColumnName);
+                        }
+
+                        // Isi Data
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            IRow dataRow = sheet.CreateRow(i + 1);
+                            for (int j = 0; j < dt.Columns.Count; j++)
+                            {
+                                dataRow.CreateCell(j).SetCellValue(dt.Rows[i][j]?.ToString() ?? "");
+                            }
+                        }
+
+                        using (FileStream fs = new FileStream(saveFile.FileName, FileMode.Create, FileAccess.Write))
+                        {
+                            workbook.Write(fs);
+                        }
+                        MessageBox.Show("Data berhasil diekspor!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Gagal mengekspor data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
 
@@ -119,12 +126,12 @@ namespace YasminClinic
                 openFile.Filter = "Excel Files|*.xlsx;*.xls";
                 if (openFile.ShowDialog() == DialogResult.OK)
                 {
-                    PreviewData(openFile.FileName);
+                    ReadAndPreviewExcel(openFile.FileName);
                 }
             }
         }
 
-        private void PreviewData(string filePath)
+        private void ReadAndPreviewExcel(string filePath)
         {
             try
             {
@@ -143,26 +150,36 @@ namespace YasminClinic
                     for (int i = 1; i <= sheet.LastRowNum; i++)
                     {
                         IRow row = sheet.GetRow(i);
-                        if (row == null) continue;
+                        if (row == null || row.Cells.Count == 0 || string.IsNullOrWhiteSpace(row.Cells[0].ToString())) continue;
 
                         DataRow dr = dt.NewRow();
-                        for (int j = 0; j < dt.Columns.Count && j < row.Cells.Count; j++)
+                        for (int j = 0; j < dt.Columns.Count; j++)
                         {
-                            dr[j] = row.Cells[j]?.ToString() ?? "";
+                            // Pastikan tidak error jika sel kosong
+                            dr[j] = row.GetCell(j)?.ToString() ?? "";
                         }
                         dt.Rows.Add(dr);
                     }
 
-        
-                     PreviewForm previewForm = new PreviewForm(dt);
-                     previewForm.ShowDialog();
-                    MessageBox.Show("Data dari Excel berhasil dibaca dan siap diproses.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Kirim data ke form preview
+                    PreviewForm previewForm = new PreviewForm(dt);
+                    previewForm.ShowDialog();
+
+                    // Muat ulang grid setelah form preview ditutup (jika ada data yang diimpor)
+                    LoadDataRekamMedis();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error membaca file Excel: " + ex.Message);
+                MessageBox.Show("Error membaca file Excel: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            DashboardResepsionis dashboard = new DashboardResepsionis();
+            dashboard.Show();
+            this.Hide();
         }
     }
 }

@@ -42,7 +42,6 @@
             this.dgvPreview.RowTemplate.Height = 24;
             this.dgvPreview.Size = new System.Drawing.Size(678, 331);
             this.dgvPreview.TabIndex = 0;
-            this.dgvPreview.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPreview_CellContentClick);
             // 
             // btnEksport
             // 
@@ -52,7 +51,6 @@
             this.btnEksport.TabIndex = 1;
             this.btnEksport.Text = "Eksport";
             this.btnEksport.UseVisualStyleBackColor = true;
-            this.btnEksport.Click += new System.EventHandler(this.button1_Click);
             // 
             // PreviewForm
             // 

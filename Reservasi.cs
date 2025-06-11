@@ -11,12 +11,14 @@ namespace YasminClinic
         private static readonly string connectionString = "Data Source=LAPTOP-D0UNNI5Q\\ZYAA;" +
                                                           "Initial Catalog=YasminClinic2; Integrated Security=True";
         private int selectedReservasiID = 0;
-        private int loggedInResepsionisID = 1;
+        private int loggedInResepsionisID = 1; // This should ideally come from a login session
         private string selectedReservasiStatus = "";
 
         public Reservasi()
         {
             InitializeComponent();
+            // Inisialisasi DateTimePicker untuk TanggalReservasi ke tanggal hari ini
+            dtpTanggalReservasi.Value = DateTime.Today;
         }
 
         private void Reservasi_Load(object sender, EventArgs e)
@@ -50,6 +52,11 @@ namespace YasminClinic
         {
             LoadDataToComboBox("sp_GetAllPasien", cmbPasien, "Nama", "PasienID");
             LoadDataToComboBox("sp_GetAllSpesialisasi", cmbSpesialisasi, "Spesialisasi", "Spesialisasi");
+            // Setelah initial load, kosongkan cmbDokter dan cmbJamReservasi
+            cmbDokter.DataSource = null;
+            cmbDokter.Text = "Pilih Dokter...";
+            cmbJamReservasi.DataSource = null;
+            cmbJamReservasi.Text = "Tidak ada jadwal";
         }
 
         private void LoadDataToComboBox(string storedProcedure, ComboBox comboBox, string displayMember, string valueMember, params SqlParameter[] parameters)
@@ -66,37 +73,85 @@ namespace YasminClinic
                     var adapter = new SqlDataAdapter(command);
                     var dt = new DataTable();
                     adapter.Fill(dt);
-                    comboBox.DataSource = dt;
+
+                    comboBox.DataSource = null; // Selalu reset DataSource
+                    comboBox.Items.Clear();     // Hapus juga item yang ada
+
                     comboBox.DisplayMember = displayMember;
                     comboBox.ValueMember = valueMember;
-                    comboBox.SelectedIndex = -1;
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        comboBox.DataSource = dt;
+                        comboBox.SelectedIndex = -1; // Jangan pilih otomatis item pertama
+                                                     // Tidak perlu mengatur Text di sini, karena DisplayMember akan menampilkan data
+                    }
+                    else
+                    {
+                        // Menambahkan item placeholder jika tidak ada data
+                        if (comboBox.Name == "cmbJamReservasi")
+                        {
+                            comboBox.Items.Add("Tidak ada jadwal"); // Tambahkan sebagai item
+                            comboBox.SelectedIndex = 0; // Pilih item placeholder
+                        }
+                        else if (comboBox.Name == "cmbDokter")
+                        {
+                            comboBox.Items.Add("Tidak ada dokter");
+                            comboBox.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            comboBox.Items.Add($"Tidak ada {displayMember}");
+                            comboBox.SelectedIndex = 0;
+                        }
+                    }
+                    comboBox.Refresh(); // Pastikan UI diperbarui
+                    comboBox.Update();  // Pastikan UI diperbarui
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Gagal memuat data untuk {comboBox.Name}: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                comboBox.DataSource = null;
+                comboBox.Items.Clear(); // Hapus item yang mungkin error
+                comboBox.Text = "Error memuat data"; // Atur teks error
+                comboBox.Refresh();
+                comboBox.Update();
             }
         }
 
         private void cmbSpesialisasi_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // Reset cmbDokter dan cmbJamReservasi saat spesialisasi berubah
+            cmbDokter.DataSource = null;
+            cmbDokter.Text = "Pilih Dokter...";
+            cmbJamReservasi.DataSource = null;
+            cmbJamReservasi.Text = "Tidak ada jadwal";
+
             if (cmbSpesialisasi.SelectedValue == null) return;
 
             string spesialisasi = cmbSpesialisasi.SelectedValue.ToString();
             var parameter = new SqlParameter("@Spesialisasi", spesialisasi);
             LoadDataToComboBox("sp_GetDokterBySpesialisasi", cmbDokter, "Nama", "DokterID", parameter);
-            cmbJamReservasi.DataSource = null;
         }
 
         private void cmbDokter_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // Reset cmbJamReservasi saat dokter berubah
+            cmbJamReservasi.DataSource = null;
+            cmbJamReservasi.Text = "Tidak ada jadwal";
+
             if (cmbDokter.SelectedValue == null) return;
-            LoadAvailableTimes();
+            LoadAvailableTimes(); // Muat ulang jam jika dokter dipilih
         }
 
         private void dtpTanggalReservasi_ValueChanged(object sender, EventArgs e)
         {
-            if (cmbDokter.SelectedValue == null) return;
+            // Reset cmbJamReservasi saat tanggal berubah
+            cmbJamReservasi.DataSource = null;
+            cmbJamReservasi.Text = "Tidak ada jadwal";
+
+            if (cmbDokter.SelectedValue == null) return; // Muat ulang jam jika dokter sudah dipilih
             LoadAvailableTimes();
         }
 
@@ -104,17 +159,35 @@ namespace YasminClinic
         {
             try
             {
-                int dokterID = (int)cmbDokter.SelectedValue;
+                if (cmbDokter.SelectedValue == null)
+                {
+                    cmbJamReservasi.DataSource = null;
+                    cmbJamReservasi.Text = "Pilih Dokter Dahulu";
+                    return;
+                }
+
+                // Gunakan Convert.ToInt32 untuk menghindari SpecifiedCastException jika SelectedValue adalah DBNull
+                int dokterID = Convert.ToInt32(cmbDokter.SelectedValue);
                 DateTime tanggal = dtpTanggalReservasi.Value.Date;
 
                 var paramDokterID = new SqlParameter("@DokterID", dokterID);
                 var paramTanggal = new SqlParameter("@Tanggal", tanggal);
 
+                // Memanggil SP untuk mendapatkan jam yang tersedia
                 LoadDataToComboBox("sp_GetJamTersediaByDokter", cmbJamReservasi, "SlotWaktu", "SlotWaktu", paramDokterID, paramTanggal);
             }
-            catch (Exception)
+            catch (InvalidCastException ex)
             {
+                // Tangani error cast spesifik, misalnya jika SelectedValue bukan int
+                MessageBox.Show("Error konversi tipe data (DokterID atau Tanggal): " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 cmbJamReservasi.DataSource = null;
+                cmbJamReservasi.Text = "Error konversi";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal memuat jam tersedia: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cmbJamReservasi.DataSource = null;
+                cmbJamReservasi.Text = "Error memuat jadwal";
             }
         }
 
@@ -126,29 +199,56 @@ namespace YasminClinic
                 return;
             }
 
-            try
+            // Validasi tambahan: Pastikan ada jadwal yang benar-benar terpilih (bukan placeholder "Tidak ada jadwal")
+            if (cmbJamReservasi.DataSource == null || cmbJamReservasi.SelectedValue.ToString() == "Tidak ada jadwal")
             {
-                using (var connection = new SqlConnection(connectionString))
-                using (var command = new SqlCommand("sp_AddReservasi", connection))
+                MessageBox.Show("Jam reservasi tidak valid. Harap pilih jam yang tersedia.", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Explicitly start a transaction for atomic operation
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction(); // Start transaction
+
+                try
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@PasienID", (int)cmbPasien.SelectedValue);
-                    command.Parameters.AddWithValue("@DokterID", (int)cmbDokter.SelectedValue);
-                    command.Parameters.AddWithValue("@TanggalReservasi", dtpTanggalReservasi.Value.Date);
-                    command.Parameters.AddWithValue("@JamReservasi", (TimeSpan)cmbJamReservasi.SelectedValue);
-                    command.Parameters.AddWithValue("@ResepsionisID", loggedInResepsionisID);
+                    using (var command = new SqlCommand("sp_AddReservasi", connection, transaction)) // Pass transaction to command
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@PasienID", Convert.ToInt32(cmbPasien.SelectedValue));
+                        command.Parameters.AddWithValue("@DokterID", Convert.ToInt32(cmbDokter.SelectedValue));
+                        command.Parameters.AddWithValue("@TanggalReservasi", dtpTanggalReservasi.Value.Date);
+                        command.Parameters.AddWithValue("@JamReservasi", (TimeSpan)cmbJamReservasi.SelectedValue);
+                        command.Parameters.AddWithValue("@ResepsionisID", loggedInResepsionisID);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                        command.ExecuteNonQuery();
+                    }
 
+                    transaction.Commit(); // Commit transaction if successful
                     MessageBox.Show("Reservasi berhasil disimpan.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadReservasiGrid();
                     ClearInputFields();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal menyimpan reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                catch (SqlException ex) // Catch specific SQL exceptions
+                {
+                    transaction.Rollback(); // Rollback transaction on error
+                    // Check if the error is from the trigger (error number 50000 for RAISERROR)
+                    if (ex.Number == 50000)
+                    {
+                        MessageBox.Show("Gagal menyimpan reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Terjadi kesalahan database: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback(); // Rollback transaction on any other error
+                    MessageBox.Show("Gagal menyimpan reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -162,24 +262,29 @@ namespace YasminClinic
 
             if (MessageBox.Show("Apakah Anda yakin ingin menghapus reservasi ini?", "Konfirmasi Hapus", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                try
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    using (var connection = new SqlConnection(connectionString))
-                    using (var command = new SqlCommand("sp_DeleteReservasi", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@ReservasiID", selectedReservasiID);
-                        connection.Open();
-                        command.ExecuteNonQuery();
+                    connection.Open();
+                    SqlTransaction transaction = connection.BeginTransaction();
 
+                    try
+                    {
+                        using (var command = new SqlCommand("sp_DeleteReservasi", connection, transaction))
+                        {
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.AddWithValue("@ReservasiID", selectedReservasiID);
+                            command.ExecuteNonQuery();
+                        }
+                        transaction.Commit();
                         MessageBox.Show("Reservasi berhasil dihapus.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadReservasiGrid();
                         ClearInputFields();
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Gagal menghapus reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        MessageBox.Show("Gagal menghapus reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
@@ -240,43 +345,131 @@ namespace YasminClinic
                 selectedReservasiID = Convert.ToInt32(row.Cells["ReservasiID"].Value);
                 selectedReservasiStatus = row.Cells["Status"].Value.ToString();
 
-                string namaPasien = row.Cells["Nama Pasien"].Value.ToString();
+                // Retrieve IDs and other values from the grid row
+                // Menggunakan Convert.ToInt32 dengan penanganan DBNull
+                int pasienID = row.Cells["PasienID"].Value == DBNull.Value ? 0 : Convert.ToInt32(row.Cells["PasienID"].Value);
                 string spesialisasi = row.Cells["Spesialisasi"].Value.ToString();
-                string namaDokter = row.Cells["Nama Dokter"].Value.ToString();
+                int dokterID = row.Cells["DokterID"].Value == DBNull.Value ? 0 : Convert.ToInt32(row.Cells["DokterID"].Value);
                 DateTime tanggalReservasi = Convert.ToDateTime(row.Cells["TanggalReservasi"].Value);
                 TimeSpan jamReservasi = (TimeSpan)row.Cells["JamReservasi"].Value;
 
-                foreach (DataRowView item in cmbPasien.Items)
+                // 1. Select Pasien
+                if (pasienID > 0 && cmbPasien.Items.Cast<DataRowView>().Any(item => Convert.ToInt32(item["PasienID"]) == pasienID))
                 {
-                    if (item["Nama"].ToString() == namaPasien)
+                    cmbPasien.SelectedValue = pasienID;
+                }
+                else // Fallback jika ID tidak ditemukan atau data grid tidak lengkap
+                {
+                    string namaPasien = row.Cells["Nama Pasien"].Value.ToString();
+                    foreach (DataRowView item in cmbPasien.Items)
                     {
-                        cmbPasien.SelectedItem = item;
-                        break;
+                        if (item["Nama"].ToString() == namaPasien)
+                        {
+                            cmbPasien.SelectedItem = item;
+                            break;
+                        }
                     }
                 }
 
-                cmbSpesialisasi.SelectedValue = spesialisasi;
-                cmbSpesialisasi_SelectedIndexChanged(null, null);
 
-                foreach (DataRowView item in cmbDokter.Items)
+                // 2. Select Spesialisasi (Ini akan memicu cmbSpesialisasi_SelectedIndexChanged)
+                // Pastikan cmbSpesialisasi tidak null
+                if (cmbSpesialisasi.Items.Cast<DataRowView>().Any(item => item["Spesialisasi"].ToString() == spesialisasi))
                 {
-                    if (item["Nama"].ToString() == namaDokter)
-                    {
-                        cmbDokter.SelectedItem = item;
-                        break;
-                    }
+                    cmbSpesialisasi.SelectedValue = spesialisasi;
+                }
+                else
+                {
+                    // Handle case where specialization from grid is not found in combobox
+                    cmbSpesialisasi.SelectedIndex = -1; // Clear selection
+                    cmbSpesialisasi.Text = spesialisasi + " (Not found)"; // Indicate missing
                 }
 
+                // 3. Set Tanggal Reservasi (Dilakukan sebelum memuat jam)
                 dtpTanggalReservasi.Value = tanggalReservasi;
-                LoadAvailableTimes();
 
-                foreach (DataRowView item in cmbJamReservasi.Items)
+                // 4. Load ALL possible time slots for the selected doctor and date for display purposes
+                // This uses sp_GetScheduleSlotsForDoctor (no availability filter)
+                try
                 {
-                    if (item["SlotWaktu"].ToString() == jamReservasi.ToString(@"hh\:mm"))
+                    using (var connection = new SqlConnection(connectionString))
+                    using (var command = new SqlCommand("sp_GetScheduleSlotsForDoctor", connection))
                     {
-                        cmbJamReservasi.SelectedItem = item;
-                        break;
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@DokterID", dokterID);
+                        command.Parameters.AddWithValue("@Tanggal", tanggalReservasi);
+
+                        var adapter = new SqlDataAdapter(command);
+                        var dt = new DataTable();
+                        adapter.Fill(dt);
+
+                        cmbJamReservasi.DataSource = null; // Clear previous
+                        if (dt.Rows.Count > 0)
+                        {
+                            cmbJamReservasi.DataSource = dt;
+                            cmbJamReservasi.DisplayMember = "SlotWaktu";
+                            cmbJamReservasi.ValueMember = "SlotWaktu";
+                            cmbJamReservasi.SelectedIndex = -1; // Default no selection
+                            cmbJamReservasi.Text = "Pilih Jam..."; // Default placeholder
+                        }
+                        else
+                        {
+                            cmbJamReservasi.Text = "Tidak ada jadwal untuk tanggal ini";
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error memuat semua slot jadwal untuk dokter: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    cmbJamReservasi.DataSource = null;
+                    cmbJamReservasi.Text = "Error memuat semua jadwal";
+                }
+
+                // 5. Select Dokter (after cmbSpesialisasi_SelectedIndexChanged might have reset it)
+                // Pastikan cmbDokter tidak null dan memiliki item sebelum set SelectedValue
+                if (dokterID > 0 && cmbDokter.Items.Cast<DataRowView>().Any(item => Convert.ToInt32(item["DokterID"]) == dokterID))
+                {
+                    cmbDokter.SelectedValue = dokterID;
+                }
+                else // Fallback jika ID tidak ditemukan atau data grid tidak lengkap
+                {
+                    string namaDokter = row.Cells["Nama Dokter"].Value.ToString();
+                    foreach (DataRowView item in cmbDokter.Items)
+                    {
+                        if (item["Nama"].ToString() == namaDokter)
+                        {
+                            cmbDokter.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+
+                // 6. Select Jam Reservasi (now that all slots are loaded)
+                if (cmbJamReservasi.DataSource != null)
+                {
+                    bool jamFound = false;
+                    foreach (DataRowView item in cmbJamReservasi.Items)
+                    {
+                        // Ensure comparison is done on TimeSpan objects
+                        if (item.Row["SlotWaktu"] is TimeSpan slotTime && slotTime == jamReservasi)
+                        {
+                            cmbJamReservasi.SelectedItem = item;
+                            jamFound = true;
+                            break;
+                        }
+                    }
+                    if (!jamFound)
+                    {
+                        // Jika jam reservasi yang dipilih tidak ada dalam daftar slot yang dimuat
+                        // Ini bisa terjadi jika jam tersebut di luar rentang jadwal yang dimuat sp_GetScheduleSlotsForDoctor
+                        // Anda bisa memilih untuk tidak menampilkan apa-apa atau menampilkan pesan
+                        cmbJamReservasi.Text = jamReservasi.ToString(@"hh\:mm") + " (Tersedia)"; // Menunjukkan jam reservasi
+                    }
+                }
+                else
+                {
+                    // Jika DataSource cmbJamReservasi null, tetap tampilkan jam yang dipilih dari grid
+                    cmbJamReservasi.Text = jamReservasi.ToString(@"hh\:mm");
                 }
             }
         }
@@ -285,9 +478,11 @@ namespace YasminClinic
         {
             cmbPasien.SelectedIndex = -1;
             cmbJamReservasi.DataSource = null;
+            cmbJamReservasi.Text = "Tidak ada jadwal"; // Set placeholder
             cmbSpesialisasi.SelectedIndex = -1;
             cmbDokter.DataSource = null;
-            dtpTanggalReservasi.Value = DateTime.Now;
+            cmbDokter.Text = "Pilih Dokter..."; // Set placeholder
+            dtpTanggalReservasi.Value = DateTime.Today; // Reset to today's date
             selectedReservasiID = 0;
             selectedReservasiStatus = "";
         }
@@ -312,29 +507,56 @@ namespace YasminClinic
                 return;
             }
 
-            try
+            // Validasi tambahan: Pastikan ada jadwal yang benar-benar terpilih (bukan placeholder)
+            if (cmbJamReservasi.DataSource == null || cmbJamReservasi.SelectedValue.ToString() == "Tidak ada jadwal")
             {
-                using (var connection = new SqlConnection(connectionString))
-                using (var command = new SqlCommand("sp_UpdateReservasi", connection))
+                MessageBox.Show("Jam reservasi tidak valid. Harap pilih jam yang tersedia.", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Explicitly start a transaction for atomic operation
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction(); // Start transaction
+
+                try
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@ReservasiID", selectedReservasiID);
-                    command.Parameters.AddWithValue("@PasienID", (int)cmbPasien.SelectedValue);
-                    command.Parameters.AddWithValue("@DokterID", (int)cmbDokter.SelectedValue);
-                    command.Parameters.AddWithValue("@TanggalReservasi", dtpTanggalReservasi.Value.Date);
-                    command.Parameters.AddWithValue("@JamReservasi", (TimeSpan)cmbJamReservasi.SelectedValue);
+                    using (var command = new SqlCommand("sp_UpdateReservasi", connection, transaction)) // Pass transaction to command
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@ReservasiID", selectedReservasiID);
+                        command.Parameters.AddWithValue("@PasienID", Convert.ToInt32(cmbPasien.SelectedValue));
+                        command.Parameters.AddWithValue("@DokterID", Convert.ToInt32(cmbDokter.SelectedValue));
+                        command.Parameters.AddWithValue("@TanggalReservasi", dtpTanggalReservasi.Value.Date);
+                        command.Parameters.AddWithValue("@JamReservasi", (TimeSpan)cmbJamReservasi.SelectedValue);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                        command.ExecuteNonQuery();
+                    }
 
+                    transaction.Commit(); // Commit transaction if successful
                     MessageBox.Show("Reservasi berhasil diperbarui.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadReservasiGrid();
                     ClearInputFields();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal memperbarui reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                catch (SqlException ex) // Catch specific SQL exceptions
+                {
+                    transaction.Rollback(); // Rollback transaction on error
+                    // Check if the error is from the trigger (error number 50000 for RAISERROR)
+                    if (ex.Number == 50000)
+                    {
+                        MessageBox.Show("Gagal memperbarui reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Terjadi kesalahan database: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback(); // Rollback transaction on any other error
+                    MessageBox.Show("Gagal memperbarui reservasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -346,7 +568,7 @@ namespace YasminClinic
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            DashboardResepsionis dashboard = new DashboardResepsionis();
+            DashboardResepsionis dashboard = new DashboardResepsionis(); // Make sure DashboardResepsionis exists
             dashboard.Show();
             this.Hide(); // Sembunyikan form saat ini
         }

@@ -10,11 +10,12 @@ namespace YasminClinic
         private static readonly string connectionString = "Data Source=LAPTOP-D0UNNI5Q\\ZYAA;" +
                                                           "Initial Catalog=YasminClinic2; Integrated Security=True";
 
-        // GANTI INI dengan ID Dokter yang login dari form sebelumnya
-        private int loggedInDokterID = 2; // Contoh: ID untuk Nina Yusuf
+        // PENTING: Nantinya, nilai ini harus Anda dapatkan dari form login
+        // untuk menentukan dokter mana yang sedang menggunakan aplikasi.
+        // Contoh: ID 1 untuk Ahmad Sulaiman, ID 2 untuk Nina Yusuf
+        private int loggedInDokterID = 1;
 
         private int selectedRekamMedisID = 0;
-        private int selectedReservasiID = 0;
 
         public RekamMedis()
         {
@@ -23,8 +24,10 @@ namespace YasminClinic
 
         private void RekamMedis_Load(object sender, EventArgs e)
         {
-            LoadPasienComboBox();
+            // Atur judul form sesuai dokter yang login untuk kejelasan
+            this.Text = $"Manajemen Rekam Medis - Dokter ID: {loggedInDokterID}";
             LoadRekamMedisGrid();
+            LoadPasienComboBox();
             ClearInputFields();
         }
 
@@ -85,42 +88,35 @@ namespace YasminClinic
 
         private void cmbNamaPasien_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbNamaPasien.SelectedValue == null || cmbNamaPasien.SelectedValue is DataRowView) return;
+            if (cmbNamaPasien.SelectedValue == null || cmbNamaPasien.SelectedValue is DataRowView)
+            {
+                cmbTanggal.DataSource = null; // Kosongkan tanggal jika pasien tidak valid
+                cmbTanggal.Text = "Pilih Tanggal...";
+                return;
+            }
 
             try
             {
                 int pasienID = Convert.ToInt32(cmbNamaPasien.SelectedValue);
                 var paramDokter = new SqlParameter("@DokterID", loggedInDokterID);
                 var paramPasien = new SqlParameter("@PasienID", pasienID);
-                // PERBAIKAN: Menggunakan ReservasiID sebagai ValueMember untuk cmbTanggal
-                LoadDataToComboBox("sp_GetTanggalKonsultasi", cmbTanggal, "TanggalReservasi", "ReservasiID", paramDokter, paramPasien);
-            }
-            catch (Exception)
-            {
-                cmbTanggal.DataSource = null;
-            }
-        }
 
-        private void cmbTanggal_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cmbTanggal.SelectedValue != null && !(cmbTanggal.SelectedValue is DataRowView))
+                // Menggunakan 'TampilanTanggal' sebagai DisplayMember dari SP yang sudah diperbaiki
+                LoadDataToComboBox("sp_GetTanggalKonsultasi", cmbTanggal, "TampilanTanggal", "ReservasiID", paramDokter, paramPasien);
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    selectedReservasiID = Convert.ToInt32(cmbTanggal.SelectedValue);
-                }
-                catch (Exception)
-                {
-                    selectedReservasiID = 0;
-                }
+                MessageBox.Show("Terjadi error saat memuat tanggal konsultasi: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cmbTanggal.DataSource = null;
             }
         }
 
         private void btnSimpan_Click(object sender, EventArgs e)
         {
-            if (cmbNamaPasien.SelectedValue == null || cmbTanggal.SelectedValue == null || string.IsNullOrWhiteSpace(txtDiagnosa.Text))
+            // Validasi sekarang berdasarkan ID Reservasi dari cmbTanggal
+            if (cmbTanggal.SelectedValue == null || string.IsNullOrWhiteSpace(txtDiagnosa.Text))
             {
-                MessageBox.Show("Pasien, Tanggal, dan Diagnosa wajib diisi.", "Input Tidak Lengkap", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Harap pilih Pasien, Tanggal Konsultasi, dan isi Diagnosa.", "Input Tidak Lengkap", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -130,24 +126,22 @@ namespace YasminClinic
                 using (var command = new SqlCommand("sp_AddRekamMedis", connection))
                 {
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@PasienID", Convert.ToInt32(cmbNamaPasien.SelectedValue));
-                    command.Parameters.AddWithValue("@DokterID", loggedInDokterID);
-                    command.Parameters.AddWithValue("@Tanggal", Convert.ToDateTime(cmbTanggal.Text)); // Mengambil teks tanggal yang terlihat
+
+                    // Cukup kirim parameter yang dibutuhkan oleh SP baru yang lebih cerdas
+                    command.Parameters.AddWithValue("@ReservasiID", Convert.ToInt32(cmbTanggal.SelectedValue));
                     command.Parameters.AddWithValue("@Keluhan", txtKeluhan.Text);
                     command.Parameters.AddWithValue("@Diagnosa", txtDiagnosa.Text);
                     command.Parameters.AddWithValue("@Tindakan", txtTindakan.Text);
                     command.Parameters.AddWithValue("@Resep", txtResep.Text);
 
-                    // PERBAIKAN: Menambahkan parameter @ReservasiID yang hilang
-                    command.Parameters.AddWithValue("@ReservasiID", selectedReservasiID);
-
                     connection.Open();
                     command.ExecuteNonQuery();
                     MessageBox.Show("Rekam medis berhasil disimpan.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                    // Muat ulang semua data untuk menampilkan kondisi terbaru
                     LoadRekamMedisGrid();
+                    LoadPasienComboBox(); // Pasien yang baru dibuatkan rekam medis akan otomatis hilang dari list
                     ClearInputFields();
-                    LoadPasienComboBox();
                 }
             }
             catch (Exception ex)
@@ -161,6 +155,12 @@ namespace YasminClinic
             if (selectedRekamMedisID == 0)
             {
                 MessageBox.Show("Pilih data dari tabel untuk diperbarui.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtDiagnosa.Text))
+            {
+                MessageBox.Show("Diagnosa tidak boleh kosong.", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -192,16 +192,9 @@ namespace YasminClinic
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            ClearInputFields();
             LoadRekamMedisGrid();
             LoadPasienComboBox();
-        }
-
-        private void btnBack_Click(object sender, EventArgs e)
-        {
-            DashboardDokter dashboard = new DashboardDokter();
-            dashboard.Show();
-            this.Hide();
+            ClearInputFields();
         }
 
         private void dgvRekamMedis_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -212,16 +205,19 @@ namespace YasminClinic
 
                 selectedRekamMedisID = Convert.ToInt32(row.Cells["RekamMedisID"].Value);
 
+                // Non-aktifkan input yang tidak boleh diubah saat mode update
                 cmbNamaPasien.Enabled = false;
                 cmbTanggal.Enabled = false;
 
+                // Tampilkan data yang dipilih di form
                 cmbNamaPasien.Text = row.Cells["Nama Pasien"].Value.ToString();
-                cmbTanggal.Text = Convert.ToDateTime(row.Cells["Tanggal"].Value).ToShortDateString();
+                cmbTanggal.Text = Convert.ToDateTime(row.Cells["Tanggal"].Value).ToString("dd/MM/yyyy");
                 txtKeluhan.Text = row.Cells["Keluhan"].Value.ToString();
                 txtDiagnosa.Text = row.Cells["Diagnosa"].Value.ToString();
                 txtTindakan.Text = row.Cells["Tindakan"].Value.ToString();
                 txtResep.Text = row.Cells["Resep"].Value.ToString();
 
+                // Ganti mode tombol Simpan/Update
                 btnSimpan.Enabled = false;
                 btnUpdate.Enabled = true;
             }
@@ -230,21 +226,35 @@ namespace YasminClinic
         private void ClearInputFields()
         {
             selectedRekamMedisID = 0;
-            selectedReservasiID = 0;
+
+            // Aktifkan kembali semua input untuk mode tambah data
             cmbNamaPasien.Enabled = true;
             cmbTanggal.Enabled = true;
+
             cmbNamaPasien.SelectedIndex = -1;
             cmbTanggal.DataSource = null;
             cmbNamaPasien.Text = "Pilih Pasien...";
             cmbTanggal.Text = "Pilih Tanggal...";
+
             txtKeluhan.Clear();
             txtDiagnosa.Clear();
             txtTindakan.Clear();
             txtResep.Clear();
+
+            // Atur ulang mode tombol
             btnSimpan.Enabled = true;
             btnUpdate.Enabled = false;
         }
 
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            DashboardDokter dashboard = new DashboardDokter();
+            dashboard.Show();
+            this.Hide();
+        }
+
+        // Method-method event yang tidak memiliki logika bisa dibiarkan kosong
+        private void cmbTanggal_SelectedIndexChanged(object sender, EventArgs e) { }
         private void txtKeluhan_TextChanged(object sender, EventArgs e) { }
         private void txtDiagnosa_TextChanged(object sender, EventArgs e) { }
         private void txtTindakan_TextChanged(object sender, EventArgs e) { }
